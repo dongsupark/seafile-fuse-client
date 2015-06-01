@@ -2,7 +2,11 @@
 
 ## Prequisites
 
-Install python-seafile:
+Install python-seafile.
+
+Python-seafile is needed as seafile-fuse-client depends on the
+[python API](https://github.com/haiwen/python-seafile.git)
+provided by seafile:
 
 	$ git clone https://github.com/dongsupark/python-seafile.git
 	$ cd python-seafile
@@ -18,7 +22,7 @@ Install required packages:
 
 	$ sudo yum install fuse python-setuptools
 
-Set up a seafile server, as introduced in tutorials on <http://manual.seafile.com/>.
+Set up a seafile server, as introduced in tutorials on http://manual.seafile.com/.
 
 ## Usage How To
 
@@ -34,6 +38,8 @@ ensure that seafilefuse.py is executable
 execute seafilefuse.py
 
 	# ./seafilefuse.py "http://127.0.0.1:8000" user@email.com password /path/to/mount/point
+
+(of course the parameters specified above must be configured for the actual seafile server.)
 
 to unmount an existing seafile directory
 
