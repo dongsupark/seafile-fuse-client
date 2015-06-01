@@ -69,11 +69,16 @@ def seafile_list_repos(client):
     return repos
 
 def seafile_find_repo(repos, repoid=None):
+    if repoid is None:
+        # just return the first repo if no repo is matched
+        return repos[0]
+
     for tmprepo in repos:
         if tmprepo.id == repoid:
             return tmprepo
-    # just return the first repo if no repo is matched
-    return repos[0]
+
+    # not found, raise exception
+    raise FuseOSError(ENOENT)
 
 class SeafileCache:
     """class for handling caches of file attributes as well as expiration time.
@@ -407,11 +412,14 @@ def main():
         '-d', '--debug', default=False, action='store_true',
         help='turn on debug output (implies -f)')
     parser.add_argument(
-        '-s', '--nothreads', default=False, action='store_true',
-        help='disallow multi-threaded operation / run with only one thread')
-    parser.add_argument(
         '-f', '--foreground', default=False, action='store_true',
         help='run in foreground')
+
+    repoid = None
+    parser.add_argument(
+        '-r', '--repoid', type=str,
+        help='specify ID of the remote repository (if not set, auto-choose the 1st repo)')
+
     parser.add_argument(
         '-o', '--options', help='add extra fuse options (see "man fuse")')
 
@@ -441,6 +449,8 @@ def main():
     if u_mount_point is not None:
         sf_mount_point = u_mount_point
 
+    u_repoid = args.__dict__.pop('repoid')
+
     # parse options
     options_str = args.__dict__.pop('options')
     options = dict([(kv.split('=', 1)+[True])[:2] for kv in (options_str and options_str.split(',')) or []])
@@ -454,7 +464,7 @@ def main():
         logfile = stderr
 
     fuse = FUSE(SeafileFUSE(server=sf_server_url, username=sf_username, \
-            password=sf_password, repoid=None, logfile=logfile), \
+            password=sf_password, repoid=u_repoid, logfile=logfile), \
             sf_mount_point, **fuse_args)
 
 
